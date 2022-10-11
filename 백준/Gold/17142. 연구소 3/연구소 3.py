@@ -1,89 +1,83 @@
 from collections import deque
-from itertools import combinations as c
-import sys
 
-input = sys.stdin.readline
-INF = 100000 #임의의 큰 수
+N,M = map(int,input().split())
 
-'''
-풀이 방법 : BFS + 조합(combinations)
-시간 복잡도 : O(n^2)
-공간 복잡도 : O(n^2)
+_map = [list(map(int,input().split())) for _ in range(N)]
 
-1.  완전탐색을 통해 빈 칸의 개수를 구하고, 모든 바이러스의 위치 정보 저장 
-2.  어떤 바이러스를 활성 상태로 만들까? -> 조합(combinations)
-3.  모든 조합 결과에 대해 활성 상태의 바이러스가 퍼지는 시간 계산하기 -> BFS 반복 수행
-4.  결과 출력
+def comb(arr,n):
 
-옵션 1.  모든 빈 칸에 바이러스를 퍼뜨리면 종료
-옵션 2.  바이러스를 어떻게 놓아도 모든 빈 칸에 바이러스를 퍼뜨릴 수 없는 경우에는 -1 출력 및 종료
-'''
+	result = []
 
-def bfs(q, blanks):
-	visited = [[-1] * n for _ in range(n)]
+	if n <= 0  :
+		return result
+	elif n == 1 :
+		for i in arr:
+			result.append([i])
+	else:
+		
+		for i in range(len(arr)-n+1):
+			for j in comb(arr[i+1:],n-1):
+				result.append([arr[i]]+j)
+			
+	return result
+
+_virus_list = []
+blank_cnt = 0
+for row in range(N):
+	for col in range(N):
+		if _map[row][col] == 2:
+			_virus_list.append((row,col))
+		elif _map[row][col] == 0:
+			blank_cnt +=1
+
+_virus_combi = comb(_virus_list,M)
+# print(_virus_combi)
+_dirlist = [[-1,0],[0,1],[0,-1],[1,0]]
+answer = 1e9
+
+def bfs(q,blank):
 
 	time = 0
-	while True:
-		length = len(q) # 큐의 길이(=1초 동안 새롭게 추가된 바이러스의 수)
-		
-		if blanks == 0 or length == 0:
-			if blanks == 0: # 옵션 1. 모든 빈 칸에 바이러스를 퍼뜨리면 종료
+	visited = [[0] * N for _ in range(N)]
+	while True :
+		len_q = len(q)
+
+		if blank == 0 or len_q == 0:
+			if blank == 0:
 				return time
-			else: # 옵션 2. 바이러스를 어떻게 놓아도 전체에 퍼뜨릴 수 없는 경우
-				return INF
-
+			else :
+				return 1e9
 		time += 1
-		for i in range(length): #큐 길이만큼 반복해주는 for문이 이 문제 해결의 핵심**
-			x, y = q.popleft()
-			if visited[x][y] == -1:
-				visited[x][y] = 1
+		for i in range(len_q):
+			row,col = q.popleft()
+			if not visited[row][col]:
+				visited[row][col] = 1	
+			for dir in _dirlist:
+				nrow = row + dir[0]
+				ncol = col + dir[1]
 
-			for d in range(4):
-				nx = x + dx[d]
-				ny = y + dy[d]
+				if 0<=nrow < N and 0<= ncol < N:
+					if visited[nrow][ncol] == 0 :
+						if _map[nrow][ncol] == 0 :
+							visited[nrow][ncol] = 1
+							q.append((nrow,ncol))
+							blank -=1
+						elif _map[nrow][ncol] == 2:
+							visited[nrow][ncol] = 1
+							q.append((nrow,ncol))						
 
-				if 0<=nx<n and 0<=ny<n:
-					if visited[nx][ny] == -1: #아직 방문하지 않은 칸에 대해
-						if board[nx][ny] == 0: # case 1: 빈 칸을 만난 경우
-							q.append((nx, ny))
-							visited[nx][ny] = 1
-							blanks -= 1
-						elif board[nx][ny] == 2: # case 2: 비활성된 바이러스를 만난 경우
-							q.append((nx, ny))
-							visited[nx][ny] = 1
 
-n, m = map(int, input().rstrip('\n').split())
-board = [list(map(int, input().rstrip('\n').split())) for _ in range(n)]
-
-virus_pos = [] # 바이러스 위치 정보 저장
-blank_cnt = 0 # 빈 칸의 개수
-
-# 1. 완전탐색을 통해 빈 칸의 개수를 구하고, 모든 바이러스의 위치 정보 저장 : O(N^2)
-for i in range(n):
-	for j in range(n):
-		if board[i][j] == 0:
-			blank_cnt += 1
-		
-		elif board[i][j] == 2:
-			virus_pos.append((i, j))
-
-# BFS를 위한 방향벡터 설정
-dx = [-1, 1, 0, 0]
-dy = [0, 0, 1, -1]
-
-# 2. 어떤 바이러스를 활성 상태로 만들까? -> 조합(combinations) 사용
-virus_combi = c(virus_pos, m)
-res = INF
-
-for virus_list in virus_combi: #모든 조합 결과에 대하여
-	q = deque()
-	for virus in virus_list:
+for virus_set in _virus_combi:
+	q= deque()
+	for virus in virus_set:
 		q.append(virus)
+	tmp = bfs(q,blank_cnt)
+	answer = min(answer,tmp)
 
-	tmp = bfs(q, blank_cnt) #BFS 수행
-	res = min(res, tmp)
-
-if res == INF: # 옵션 2. 바이러스를 어떻게 놓아도 전체에 퍼뜨릴 수 없는 경우
+if answer == 1e9:
 	print(-1)
 else:
-	print(res)
+	print(answer)
+
+
+
