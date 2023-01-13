@@ -7,7 +7,7 @@ def solution(users, emoticons):
     
     # 1. 할인율 별로 emoticon 가격 책정 list 
     sale_rate = [10,20,30,40]
-    answer_person, answer_pay = 0,0
+    result = [0,0]
     for combi in product(sale_rate,repeat=len(emoticons)):
         num_person, sum_pay = 0,0
         for user in users : # 각 combi에 대해 user들의 행동
@@ -21,10 +21,7 @@ def solution(users, emoticons):
                 user_sum_pay = 0
             sum_pay += user_sum_pay
         
-        if num_person > answer_person :
-            answer_person,answer_pay = num_person,sum_pay
-        elif num_person == answer_person : 
-            if sum_pay > answer_pay:
-                answer_pay = sum_pay
-            
-    return [answer_person,answer_pay]
+        result = max(result,[num_person,sum_pay])
+
+        
+    return result
