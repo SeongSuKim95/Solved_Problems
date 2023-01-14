@@ -27,7 +27,7 @@ def solution(n, k, enemy):
     answer, sumEnemy = 0, 0
     heap = []
     
-    for e in enemy:
+    for e in enemy: # -부호 붙여서 최대힙으로 변환
         heappush(heap, -e)
         sumEnemy += e
         if sumEnemy > n:
