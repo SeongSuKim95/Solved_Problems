@@ -1,19 +1,20 @@
 def solution(order):
-    temp = []
+    answer = 0
+    stacks = []
+    N = len(order)
     i = 1
-    now = 0
-    
-    while i != len(order)+1:
-        temp.append(i)
-        while temp[-1] == order[now]:
-            now += 1
-            temp.pop()
-            
-            if len(temp) == 0:
+    idx = 0
+    while i < N+1:
+        stacks.append(i)
+        while stacks[-1] == order[idx]:
+            idx += 1
+            stacks.pop()
+            if len(stacks) == 0:
                 break
         i += 1
 
 
-    return now 
+    return idx
+
             
         
