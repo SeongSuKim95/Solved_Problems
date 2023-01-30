@@ -1,19 +1,18 @@
-from collections import deque
+cnt = 0
 
-answer = 0
-def dfs(numbers,target,sum,idx):
-    global answer
-    if idx == len(numbers):
+def dfs(numbers,target,depth,sum):
+    global cnt
+    if depth == len(numbers):
         if sum == target:
-            answer +=1
-    else:
-        cur = numbers[idx]
-        dfs(numbers,target,sum+cur,idx+1)
-        dfs(numbers,target,sum-cur,idx+1)
-        
+            cnt += 1
+    else :
+        num = numbers[depth]
+        dfs(numbers,target,depth+1,sum-num)
+        dfs(numbers,target,depth+1,sum+num)
     
 def solution(numbers,target):
-    idx = 0
-    dfs(numbers,target,0,idx)
     
-    return answer
+    sum = 0
+    dfs(numbers,target,0,sum)
+    
+    return cnt
