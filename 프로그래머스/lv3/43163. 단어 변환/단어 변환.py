@@ -34,5 +34,6 @@ def solution(begin, target, words):
     dfs(0,0,maps,target,words,visited)
     return answer        
 
+# 최단거리이므로 bfs로 푸는게 효율적!
 
 
