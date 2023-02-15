@@ -1,48 +1,57 @@
 from collections import deque
 
-dr = (-1, 1, 0, 0)
-dc = (0, 0, -1, 1)
-KLst = [k*k+(k-1)*(k-1) for k in range(26)]     # K의 값 리스트 미리 구해놓기
+# 상 하 좌 우
+dr = [-1,1,0,0]
+dc = [0,0,-1,1]
+cost_lst = [ K * K + (K-1)*(K-1) for K in range(25)]
 
-def bfs(sr, sc):
-    global maxCnt
+def bfs(i,j):
+    
+    global max_cnt
+    
     visited = [[0] * N for _ in range(N)]
-    visited[sr][sc] = 1
-    Q = deque([(sr, sc)])
 
-    home = A[sr][sc]
-    dis = 1
-    # 1 크기일 때도 검사
-    if home * M - KLst[dis] >= 0:
-        maxCnt = max(home, maxCnt)
-    while dis < N+1:
-        qlen = len(Q)
-        for _ in range(qlen):
-            r, c = Q.popleft()
-            for d in range(4):
-                nr = r + dr[d]
-                nc = c + dc[d]
-                if not (0 <= nr < N and 0 <= nc < N):
+    Q = deque([(i,j)])
+    
+    visited[i][j] = 1
+    cnt = 1
+    home = maps_[i][j]
+
+    if home * M - cost_lst[1] >= 0 :
+        max_cnt = max(max_cnt,home)
+    
+    while cnt <= N + 1  :
+
+        qlength = len(Q)
+        
+        for _ in range(qlength):
+
+            r,c = Q.popleft()
+
+            for dir in range(4):
+                nr = r + dr[dir]
+                nc = c + dc[dir]
+
+                if not(0<=nr<N and 0<=nc<N):
                     continue
                 if not visited[nr][nc]:
+                    Q.append((nr,nc))
                     visited[nr][nc] = 1
-                    Q.append((nr, nc))
-                    if A[nr][nc]:       # 집이 있는 경우
+
+                    if maps_[nr][nc] :
                         home += 1
-        # 보안회사의 이익이 0 이상이면 최댓값 갱신
-        if home*M - KLst[dis+1] >= 0:
-            maxCnt = max(home, maxCnt)
-        dis += 1
+        if home * M - cost_lst[cnt+1] >= 0 :
+            max_cnt = max(max_cnt,home)
+        cnt += 1 
 
-
-# main
 T = int(input())
 for tc in range(T):
-    N, M = map(int, input().split())
-    A = [list(map(int, input().split())) for _ in range(N)]
 
-    maxCnt = 0
+    N , M = map(int, input().split())
+
+    maps_ = [list(map(int,input().split())) for _ in range(N)]
+    max_cnt = 0
     for i in range(N):
         for j in range(N):
-            bfs(i, j)       # 모든 위치에서 검사
-    print("#{} {}".format(tc+1, maxCnt))
+            bfs(i,j)
+    print("#{} {}".format(tc+1,max_cnt))
