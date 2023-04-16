@@ -1,12 +1,22 @@
+import heapq
 def solution(priorities, location):
-    answer = []
-    index = [i for i in range(len(priorities))]
-    while priorities:
-        if priorities[0] == max(priorities):
-            priorities.pop(0)
-            answer.append(index.pop(0))
-        else:
-            priorities.append(priorities.pop(0))
-            index.append(index.pop(0))
     
-    return answer.index(location)+1
+    answer = []
+    wait_list = []
+    pq = []
+    
+    for idx,elem in enumerate(priorities):
+        wait_list.append((idx,elem))
+        heapq.heappush(pq,-elem)
+    cnt = 0
+    
+    while wait_list :
+        if wait_list[0][1] == -pq[0]:
+            idx,v = wait_list.pop(0)
+            heapq.heappop(pq)
+            cnt += 1
+            if idx == location :
+                return cnt
+        else :
+            idx,v = wait_list.pop(0)
+            wait_list.append((idx,v))
