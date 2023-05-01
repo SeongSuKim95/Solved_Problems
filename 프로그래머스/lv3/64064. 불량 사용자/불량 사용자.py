@@ -27,6 +27,7 @@ def count(idx,possible_id,visited):
 
 def solution(user_id, banned_id):
     global answers
+    
     possible_id = [set() for bid in banned_id]
     
     for b_idx,b_id in enumerate(banned_id):
